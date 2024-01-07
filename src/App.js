@@ -1,23 +1,30 @@
 import logo from './logo.svg';
 import './App.css';
+import Hand from './components/Hand';
+// import {startRound} from './Functions';
+import {useState} from 'react';
 
 function App() {
+  const [dealerHand, setDealerHand] = useState(['X']);
+  const [playerHand, setPlayerHand] = useState(['X']);
+
+  const startRound = () => {
+    setDealerHand(['1','2']);
+    setPlayerHand(['2','3']);
+  }
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+      <div className="title">
+        Blackjack
+      </div>
+      <div className="game-area">
+        <Hand name="Dealer's" cards={dealerHand}/>
+        <Hand name="Your" cards={playerHand}/>
+        <div className="buttons">
+          <button className="start" onClick={startRound}>Start</button>
+        </div>
+      </div>
     </div>
   );
 }
