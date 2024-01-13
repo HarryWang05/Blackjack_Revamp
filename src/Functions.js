@@ -20,6 +20,9 @@ export const drawCard = (deck) => {
         numCards: deck.numCards,
         totalCards: deck.totalCards.slice()
     };*/
+    if(deck.numCards <= 0) {
+        return [13,0]; // Returns 'X' if there are no more cards in the deck
+    }
     let pickedCard = randomInt(deck.numCards);
     for(let i = 0; i < 13; i++) {
         for(let j = 0; j < 4; j++) {
@@ -44,4 +47,16 @@ export const createDecks = (num) => {
         }
     }
     return deck;
+}
+
+export const calcHand = (hand) => {
+    let total = 0;
+    for(let i = 0; i < hand.length; i++) {
+        if(hand[i][0] > 9) {
+            total += 10; // when face card
+        } else {
+            total += hand[i][0]+1; // face value
+        }
+    }
+    return total;
 }

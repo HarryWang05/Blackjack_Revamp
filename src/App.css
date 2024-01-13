@@ -22,3 +22,11 @@ body {
     margin: auto;
     width: 50%;
 }
+
+.invis {
+    display: none;
+}
+
+button {
+    margin: 5px;
+}
