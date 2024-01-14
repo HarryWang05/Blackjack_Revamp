@@ -1,7 +1,12 @@
-let cardStrings = ['1','2','3','4','5','6','7','8','9','10','J','Q','K','X']; // index 13 'X' is used for when a placeholder is desired rather than an actual card
+interface Props {
+    name: string;
+    cards: number[][];
+}
 
-const Hand = (props) => {
-    let charHand = [];
+let cardStrings: string[] = ['1','2','3','4','5','6','7','8','9','10','J','Q','K','X']; // index 13 'X' is used for when a placeholder is desired rather than an actual card
+
+const Hand = (props: Props) => {
+    let charHand: string[] = [];
     for(let i = 0; i < props.cards.length; i++) {
         charHand.push(cardStrings[props.cards[i][0]]); // Change each card from hand from int to char
     }

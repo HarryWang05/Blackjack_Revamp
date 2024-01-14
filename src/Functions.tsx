@@ -1,6 +1,11 @@
-let baseCards = [];
+export interface Deck {
+    numCards: number;
+    totalCards: number[][];
+}
 
-let fourKinds = [];
+let baseCards: number[][] = [];
+
+let fourKinds: number[] = [];
 
 for(let j = 0; j < 4; j++) {
     fourKinds.push(0);
@@ -11,11 +16,11 @@ for(let i = 0; i < 13; i++) {
     baseCards.push(fourKinds.slice());
 } // 13 indices, one for each card value, with [0] = Aces ... [12] = Kings
 
-const randomInt = (num) => {
+const randomInt = (num: number) => {
     return Math.ceil(Math.random()*num);
 }
 
-export const drawCard = (deck) => {
+export const drawCard = (deck: Deck) => {
     /*let newDeck = {
         numCards: deck.numCards,
         totalCards: deck.totalCards.slice()
@@ -34,10 +39,11 @@ export const drawCard = (deck) => {
             }
         }
     }
+    return [13,0];
 }
 
-export const createDecks = (num) => {
-    let deck = {
+export const createDecks = (num: number) => {
+    let deck: Deck = {
         numCards: num*52,
         totalCards: baseCards.slice()
     };
@@ -49,7 +55,7 @@ export const createDecks = (num) => {
     return deck;
 }
 
-export const calcHand = (hand) => {
+export const calcHand = (hand: number[][]) => {
     let total = 0;
     for(let i = 0; i < hand.length; i++) {
         if(hand[i][0] > 9) {

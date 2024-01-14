@@ -2,10 +2,10 @@ import logo from './logo.svg';
 import './App.css';
 import Hand from './components/Hand';
 import Message from './components/Message';
-import {drawCard, createDecks, calcHand} from './Functions';
+import {Deck, drawCard, createDecks, calcHand} from './Functions';
 import {useState} from 'react';
 
-let curDeck;
+let curDeck: Deck;
 
 function App() {
   const [dealerHand, setDealerHand] = useState([[13,0]]);
@@ -15,7 +15,7 @@ function App() {
   const [started, setStarted] = useState(false);
   const [playerOver, setPlayerOver] = useState(false);
 
-  let hiddenCard; // Dealer's first card
+  let hiddenCard: number[]; // Dealer's first card
   let cutoff = 0.5; // Decimal fraction of when to shuffle deck
 
   const startRound = () => {
@@ -25,7 +25,7 @@ function App() {
   }
 
   const restartRound = () => {
-    if(curDeck.cards <= 52*cutoff) {
+    if(curDeck.numCards <= 52*cutoff) {
       curDeck = createDecks(1);
     }
     firstDeal();
@@ -34,7 +34,7 @@ function App() {
 
   const firstDeal = () => {
     let deal = [drawCard(curDeck), drawCard(curDeck), drawCard(curDeck), drawCard(curDeck)];
-    setPlayerHand(deal[0]);
+    setPlayerHand([deal[0]]);
     hiddenCard = deal[1]; // Store hidden card in variable
     setPlayerHand([deal[0], deal[2]]);
     setDealerHand([[13,0],deal[3]]); // [13,0] is 'X', the hidden card
