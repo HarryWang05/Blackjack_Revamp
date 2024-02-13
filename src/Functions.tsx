@@ -89,3 +89,12 @@ export const isBust = (hand: number[][]) => {
   }
   return false;
 };
+
+export const checkHandEvent = (hand: number[][]) => {
+  if(calcHand(hand) > 21) {
+    return "bust!";
+  } else if((hand.length == 2) && (hand[0][0] == 0 || hand[1][0] == 0) && (calcHand(hand) == 21)) {
+    return "natural!";
+  }
+  return "?!";
+}

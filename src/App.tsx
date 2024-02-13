@@ -1,13 +1,14 @@
-import logo from "./logo.svg";
 import "./App.css";
 import Hand from "./components/Hand";
 import Message from "./components/Message";
 import Modal from "./components/Modal";
-import { Deck, drawCard, createDecks, calcHand, isBust } from "./Functions";
+import { Deck, drawCard, createDecks, calcHand, isBust, checkHandEvent } from "./Functions";
 import { useState } from "react";
 
 let curDeck: Deck;
-let hiddenCard: number[]; // Dealer's first card
+let realPlayer: number[][]; // Real player's hand for calc
+let realDealer: number[][]; // Real dealer's hand for calc, includes hidden card
+let hidden = true; // Whether or not to hide dealer's first card
 
 function App() {
   /*const [state, setState] = useState({
@@ -37,6 +38,7 @@ function App() {
     if (curDeck.numCards <= 52 * cutoff) {
       curDeck = createDecks(1);
     }
+    hidden = true;
     firstDeal();
     setRoundOver(false);
     setDealerEvent("");
@@ -50,65 +52,84 @@ function App() {
       drawCard(curDeck),
       drawCard(curDeck),
     ];
-    hiddenCard = deal[1].slice(); // Store hidden card in variable
-    setPlayerHand([deal[0], deal[2]]);
-    setDealerHand([[13, 0], deal[3]]); // [13,0] is 'X', the hidden card
+    realPlayer = [deal[0], deal[2]];
+    realDealer = [deal[1], deal[3]];
+    updateHands();
     setDealerEvent("playing");
   };
 
   const doHit = () => {
     // alert(JSON.stringify(curDeck));
-    let drawn = drawCard(curDeck);
-    if (isBust([...playerHand, drawn])) {
-      setPlayerEvent("Bust!");
-      startDealer(true); // Player bust true
+    realPlayer.push(drawCard(curDeck));
+    if (checkHandEvent(realPlayer) == "bust!") {
+      handleWinEvent();
+    } else {
+      updateHands();
     }
-    setPlayerHand([...playerHand, drawn]);
   };
 
   const doStand = () => {
-    setRoundOver(true);
-    startDealer(false); // Player bust false
+    handleWinEvent();
   };
 
-  const startDealer = (isPlayerBust: Boolean) => {
-    let tempHand = JSON.parse(JSON.stringify(dealerHand)); // Temp hand to store dealer hand
-    tempHand[0] = hiddenCard; // Reveal hidden card
-    if (isPlayerBust) {
-      dealerWin();
+  const startDealer = () => {
+    let returnVal = "";
+    if (checkHandEvent(realPlayer) == "bust!") {
+      returnVal = "win!";
     } else {
-      while (calcHand(tempHand) < 17) {
-        tempHand.push(drawCard(curDeck));
+      while (calcHand(realDealer) < 17) {
+        realDealer.push(drawCard(curDeck));
       }
-      if (isBust(tempHand)) {
-        setDealerEvent("bust!");
-        playerWin();
-      } else if (calcHand(tempHand) < calcHand(playerHand)) {
-        playerWin();
-      } else if (calcHand(tempHand) > calcHand(playerHand)) {
-        dealerWin();
+      if (isBust(realDealer)) {
+        returnVal = "bust!";
+      } else if (calcHand(realDealer) < calcHand(realPlayer)) {
+        returnVal = "lose!"
+      } else if (calcHand(realDealer) > calcHand(realPlayer)) {
+        returnVal = "win!";
       } else {
-        push();
+        returnVal = "push!";
       }
     }
-    setDealerHand(tempHand);
+    return returnVal;
   };
 
-  const dealerWin = () => {
-    setDealerEvent("wins!");
+  const handleWinEvent = () => {
+    let playerHandEvent = checkHandEvent(realPlayer);
+    let dealerHandEvent = checkHandEvent(realDealer);
+    if (dealerHandEvent == "?!") {
+      dealerHandEvent = startDealer();
+    }
+    if (playerHandEvent == "?!") {
+      if (dealerHandEvent == "bust!" || dealerHandEvent == "lose!") {
+        playerHandEvent = "win!";
+      } else if (dealerHandEvent == "win!" || dealerHandEvent == "natural!") {
+        playerHandEvent = "lose!";
+      } else {
+        playerHandEvent = "push!";
+      }
+    } else if (playerHandEvent == "natural!") {
+      if (dealerHandEvent == "natural!") {
+        playerHandEvent = "push!";
+        dealerHandEvent = "push!";
+      } else {
+        dealerHandEvent = "lose!";
+      }
+    }
+    hidden = false;
+    setPlayerEvent(playerHandEvent);
+    setDealerEvent(dealerHandEvent);
+    updateHands();
     setRoundOver(true);
   };
 
-  const playerWin = () => {
-    setPlayerEvent("wins!");
-    setRoundOver(true);
-  };
-
-  const push = () => {
-    setDealerEvent("push!");
-    setPlayerEvent("push!");
-    setRoundOver(true);
-  };
+  const updateHands = () => {
+    setPlayerHand(realPlayer);
+    if (hidden) {
+      setDealerHand([[13, 0], realDealer[1]]); // [13,0] is 'X', the hidden card
+    } else {
+      setDealerHand(realDealer);
+    }
+  }
 
   return (
     <div className="App">
