@@ -51,17 +51,37 @@ export const createDecks = (num: number) => {
   return deck;
 };
 
-export const calcHand = (hand: number[][]) => {
+export const calcHardTotal = (hand: number[][]) => {
   let total = 0;
   for (let i = 0; i < hand.length; i++) {
-    if (hand[i][0] > 9) {
+    if (hand[i][0] == 13) {
+      total += 0; // when 'X' add zero
+    } else if (hand[i][0] > 9) {
       total += 10; // when face card
     } else {
       total += hand[i][0] + 1; // face value
     }
   }
   return total;
+}
+
+export const calcHand = (hand: number[][]) => {
+  let total = 0;
+  total = calcHardTotal(hand);
+  if (total < 12) {
+    for (let i = 0; i < hand.length; i++) {
+      if (hand[i][0] == 0) {
+        total += 10;
+        break;
+      }
+    }
+  } // check for soft total
+  return total;
 };
+
+export const isSoftTotal = (hand: number[][]) => {
+  return (calcHand(hand) != calcHardTotal(hand));
+}
 
 export const isBust = (hand: number[][]) => {
   if (calcHand(hand) > 21) {

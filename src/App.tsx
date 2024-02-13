@@ -2,6 +2,7 @@ import logo from "./logo.svg";
 import "./App.css";
 import Hand from "./components/Hand";
 import Message from "./components/Message";
+import Modal from "./components/Modal";
 import { Deck, drawCard, createDecks, calcHand, isBust } from "./Functions";
 import { useState } from "react";
 
@@ -9,7 +10,7 @@ let curDeck: Deck;
 let hiddenCard: number[]; // Dealer's first card
 
 function App() {
-	/*const [state, setState] = useState({
+  /*const [state, setState] = useState({
 		dealerHand: [[13,0]],
 		playerHand: [[13,0]],
 		dealerEvent: "",
@@ -23,6 +24,7 @@ function App() {
   const [playerEvent, setPlayerEvent] = useState("");
   const [started, setStarted] = useState(false);
   const [roundOver, setRoundOver] = useState(false);
+  const [settingModal, setSettingModal] = useState(false);
   let cutoff = 0.5; // Decimal fraction of when to shuffle deck
 
   const startRound = () => {
@@ -37,8 +39,8 @@ function App() {
     }
     firstDeal();
     setRoundOver(false);
-		setDealerEvent('');
-		setPlayerEvent('');
+    setDealerEvent("");
+    setPlayerEvent("");
   };
 
   const firstDeal = () => {
@@ -49,67 +51,64 @@ function App() {
       drawCard(curDeck),
     ];
     hiddenCard = deal[1].slice(); // Store hidden card in variable
-		alert(JSON.stringify(hiddenCard) + "hiddenCardasdf");
     setPlayerHand([deal[0], deal[2]]);
     setDealerHand([[13, 0], deal[3]]); // [13,0] is 'X', the hidden card
     setDealerEvent("playing");
   };
 
   const doHit = () => {
-    alert(JSON.stringify(curDeck));
+    // alert(JSON.stringify(curDeck));
     let drawn = drawCard(curDeck);
     if (isBust([...playerHand, drawn])) {
       setPlayerEvent("Bust!");
-			startDealer(true); // Player bust true
+      startDealer(true); // Player bust true
     }
     setPlayerHand([...playerHand, drawn]);
   };
 
   const doStand = () => {
     setRoundOver(true);
-		startDealer(false); // Player bust false
+    startDealer(false); // Player bust false
   };
 
-	const startDealer = (isPlayerBust: Boolean) => {
-		alert("reached startDealer");
-		let tempHand = JSON.parse(JSON.stringify(dealerHand)); // Temp hand to store dealer hand
-		tempHand[0] = hiddenCard; // Reveal hidden card
-		if(isPlayerBust) {
-			dealerWin();
-		} else {
-			while(calcHand(tempHand) < 17) {
-				tempHand.push(drawCard(curDeck));
-			}
-			if(isBust(tempHand)) {
-				setDealerEvent("bust!");
-				playerWin();
-			} else if(calcHand(tempHand) < calcHand(playerHand)) {
-				playerWin();
-			} else if(calcHand(tempHand) > calcHand(playerHand)) {
-				dealerWin();
-			} else {
-				tie();
-			}
-		}
-		setDealerHand(tempHand);
-	}
+  const startDealer = (isPlayerBust: Boolean) => {
+    let tempHand = JSON.parse(JSON.stringify(dealerHand)); // Temp hand to store dealer hand
+    tempHand[0] = hiddenCard; // Reveal hidden card
+    if (isPlayerBust) {
+      dealerWin();
+    } else {
+      while (calcHand(tempHand) < 17) {
+        tempHand.push(drawCard(curDeck));
+      }
+      if (isBust(tempHand)) {
+        setDealerEvent("bust!");
+        playerWin();
+      } else if (calcHand(tempHand) < calcHand(playerHand)) {
+        playerWin();
+      } else if (calcHand(tempHand) > calcHand(playerHand)) {
+        dealerWin();
+      } else {
+        push();
+      }
+    }
+    setDealerHand(tempHand);
+  };
 
-	const dealerWin = () => {
-		alert("reached dealerWin");
-		setDealerEvent("wins!");
-		setRoundOver(true);
-	}
+  const dealerWin = () => {
+    setDealerEvent("wins!");
+    setRoundOver(true);
+  };
 
-	const playerWin = () => {
-		setPlayerEvent("wins!");
-		setRoundOver(true);
-	}
+  const playerWin = () => {
+    setPlayerEvent("wins!");
+    setRoundOver(true);
+  };
 
-	const tie = () => {
-		setDealerEvent("ties!");
-		setPlayerEvent("ties!");
-		setRoundOver(true);
-	}
+  const push = () => {
+    setDealerEvent("push!");
+    setPlayerEvent("push!");
+    setRoundOver(true);
+  };
 
   return (
     <div className="App">
@@ -123,29 +122,39 @@ function App() {
         <Message name="Player" event={playerEvent} />
         <div className="buttons">
           <button
-            className={`${started || roundOver ? "start invis" : "start"}`}
+            className={`start ${started || roundOver ? "invis" : ""}`}
             onClick={startRound}
           >
             Start
           </button>
           <button
-            className={`${started && !roundOver ? "hit" : "hit invis"}`}
+            className={`hit ${started && !roundOver ? "" : "invis"}`}
             onClick={doHit}
           >
             Hit
           </button>
           <button
-            className={`${started && !roundOver ? "stand" : "stand invis"}`}
+            className={`stand ${started && !roundOver ? "" : "invis"}`}
             onClick={doStand}
           >
             Stand
           </button>
           <button
-            className={`${roundOver ? "restart" : "restart invis"}`}
+            className={`restart ${roundOver ? "" : "invis"}`}
             onClick={restartRound}
           >
             Next
           </button>
+          <br />
+          <button 
+            className={`${settingModal ? "invis" : ""}`}
+            onClick={() => setSettingModal(true)}
+          >
+            Settings
+          </button>
+          <Modal open={settingModal} onClose={() => setSettingModal(false)}>
+            Settings coming soon!
+          </Modal>
         </div>
       </div>
     </div>
