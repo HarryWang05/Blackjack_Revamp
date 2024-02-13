@@ -95,6 +95,8 @@ export const checkHandEvent = (hand: number[][]) => {
     return "bust!";
   } else if((hand.length == 2) && (hand[0][0] == 0 || hand[1][0] == 0) && (calcHand(hand) == 21)) {
     return "natural!";
+  } else if(hand.length == 6) {
+    return "six card Charlie!"
   }
   return "?!";
 }

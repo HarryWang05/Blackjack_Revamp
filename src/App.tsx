@@ -61,7 +61,7 @@ function App() {
   const doHit = () => {
     // alert(JSON.stringify(curDeck));
     realPlayer.push(drawCard(curDeck));
-    if (checkHandEvent(realPlayer) == "bust!") {
+    if (checkHandEvent(realPlayer) != "?!") {
       handleWinEvent();
     } else {
       updateHands();
@@ -75,15 +75,21 @@ function App() {
   const startDealer = () => {
     let returnVal = "";
     if (checkHandEvent(realPlayer) == "bust!") {
-      returnVal = "win!";
+      returnVal = (checkHandEvent(realDealer) == "natural!" ? "natural!" : "win!"); // Special case when player busts and dealer has a meaningless natural
+    } else if (checkHandEvent(realPlayer) == "six card Charlie!") {
+      returnVal = "lose!";
     } else {
       while (calcHand(realDealer) < 17) {
         realDealer.push(drawCard(curDeck));
       }
       if (isBust(realDealer)) {
         returnVal = "bust!";
+      } else if (checkHandEvent(realDealer) == "natural!" && checkHandEvent(realPlayer) == "natural!") {
+        returnVal = "push!";
+      } else if (checkHandEvent(realDealer) == "natural!") {
+        returnVal = "natural!";
       } else if (calcHand(realDealer) < calcHand(realPlayer)) {
-        returnVal = "lose!"
+        returnVal = "lose!";
       } else if (calcHand(realDealer) > calcHand(realPlayer)) {
         returnVal = "win!";
       } else {
@@ -96,24 +102,16 @@ function App() {
   const handleWinEvent = () => {
     let playerHandEvent = checkHandEvent(realPlayer);
     let dealerHandEvent = checkHandEvent(realDealer);
-    if (dealerHandEvent == "?!") {
-      dealerHandEvent = startDealer();
-    }
+    dealerHandEvent = startDealer();
     if (playerHandEvent == "?!") {
       if (dealerHandEvent == "bust!" || dealerHandEvent == "lose!") {
         playerHandEvent = "win!";
-      } else if (dealerHandEvent == "win!" || dealerHandEvent == "natural!") {
+      } else {
         playerHandEvent = "lose!";
-      } else {
-        playerHandEvent = "push!";
       }
-    } else if (playerHandEvent == "natural!") {
-      if (dealerHandEvent == "natural!") {
-        playerHandEvent = "push!";
-        dealerHandEvent = "push!";
-      } else {
-        dealerHandEvent = "lose!";
-      }
+    }
+    if (dealerHandEvent == "push!") {
+      playerHandEvent = "push!";
     }
     hidden = false;
     setPlayerEvent(playerHandEvent);
@@ -125,7 +123,7 @@ function App() {
   const updateHands = () => {
     setPlayerHand(realPlayer);
     if (hidden) {
-      setDealerHand([[13, 0], realDealer[1]]); // [13,0] is 'X', the hidden card
+      setDealerHand([realDealer[0], [13, 0]]); // [13,0] is 'X', the hidden card
     } else {
       setDealerHand(realDealer);
     }
