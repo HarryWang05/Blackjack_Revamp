@@ -16,11 +16,11 @@ for (let i = 0; i < 13; i++) {
   baseCards.push(fourKinds.slice());
 } // 13 indices, one for each card value, with [0] = Aces ... [12] = Kings
 
-const randomInt = (num: number) => {
+const randomInt = (num: number): number => {
   return Math.ceil(Math.random() * num);
 };
 
-export const drawCard = (deck: Deck) => {
+export const drawCard = (deck: Deck): number[] => {
   if (deck.numCards <= 0) {
     return [13, 0]; // Returns 'X' if there are no more cards in the deck
   }
@@ -38,7 +38,7 @@ export const drawCard = (deck: Deck) => {
   return [13, 0];
 };
 
-export const createDecks = (num: number) => {
+export const createDecks = (num: number): Deck => {
   let deck: Deck = {
     numCards: num * 52,
     totalCards: JSON.parse(JSON.stringify(baseCards)),
@@ -51,7 +51,7 @@ export const createDecks = (num: number) => {
   return deck;
 };
 
-export const calcHardTotal = (hand: number[][]) => {
+export const calcHardTotal = (hand: number[][]): number => {
   let total = 0;
   for (let i = 0; i < hand.length; i++) {
     if (hand[i][0] == 13) {
@@ -65,7 +65,7 @@ export const calcHardTotal = (hand: number[][]) => {
   return total;
 }
 
-export const calcHand = (hand: number[][]) => {
+export const calcHand = (hand: number[][]): number => {
   let total = 0;
   total = calcHardTotal(hand);
   if (total < 12) {
@@ -79,18 +79,15 @@ export const calcHand = (hand: number[][]) => {
   return total;
 };
 
-export const isSoftTotal = (hand: number[][]) => {
+export const isSoftTotal = (hand: number[][]): boolean => {
   return (calcHand(hand) != calcHardTotal(hand));
 }
 
-export const isBust = (hand: number[][]) => {
-  if (calcHand(hand) > 21) {
-    return true;
-  }
-  return false;
+export const isBust = (hand: number[][]): boolean => {
+  return (calcHand(hand) > 21);
 };
 
-export const checkHandEvent = (hand: number[][]) => {
+export const checkHandEvent = (hand: number[][]): string => {
   if(calcHand(hand) > 21) {
     return "bust!";
   } else if((hand.length == 2) && (hand[0][0] == 0 || hand[1][0] == 0) && (calcHand(hand) == 21)) {
@@ -100,3 +97,30 @@ export const checkHandEvent = (hand: number[][]) => {
   }
   return "?!";
 }
+
+export const startDealer = (playerHand: number[][], dealerHand: number[][], deck: Deck): string => {
+  let returnVal = "";
+  if (checkHandEvent(playerHand) == "bust!") {
+    returnVal = (checkHandEvent(dealerHand) == "natural!" ? "natural!" : "win!"); // Special case when player busts and dealer has a meaningless natural
+  } else if (checkHandEvent(playerHand) == "six card Charlie!") {
+    returnVal = "lose!";
+  } else {
+    while (calcHand(dealerHand) < 17) {
+      dealerHand.push(drawCard(deck));
+    }
+    if (isBust(dealerHand)) {
+      returnVal = "bust!";
+    } else if (checkHandEvent(dealerHand) == "natural!" && checkHandEvent(playerHand) == "natural!") {
+      returnVal = "push!";
+    } else if (checkHandEvent(dealerHand) == "natural!") {
+      returnVal = "natural!";
+    } else if (calcHand(dealerHand) < calcHand(playerHand)) {
+      returnVal = "lose!";
+    } else if (calcHand(dealerHand) > calcHand(playerHand)) {
+      returnVal = "win!";
+    } else {
+      returnVal = "push!";
+    }
+  }
+  return returnVal;
+};

@@ -2,7 +2,7 @@ import "./App.css";
 import Hand from "./components/Hand";
 import Message from "./components/Message";
 import Modal from "./components/Modal";
-import { Deck, drawCard, createDecks, calcHand, isBust, checkHandEvent } from "./Functions";
+import { Deck, drawCard, createDecks, calcHand, isBust, checkHandEvent, startDealer } from "./Functions";
 import { useState } from "react";
 
 let curDeck: Deck;
@@ -28,15 +28,16 @@ function App() {
   const [settingModal, setSettingModal] = useState(false);
   let cutoff = 0.5; // Decimal fraction of when to shuffle deck
 
-  const startRound = () => {
+  const startRound = (): void => {
     curDeck = createDecks(1);
     firstDeal();
     setStarted(true);
   };
 
-  const restartRound = () => {
+  const restartRound = (): void => {
     if (curDeck.numCards <= 52 * cutoff) {
       curDeck = createDecks(1);
+      alert('Deck Shuffled!');
     }
     hidden = true;
     firstDeal();
@@ -45,7 +46,7 @@ function App() {
     setPlayerEvent("");
   };
 
-  const firstDeal = () => {
+  const firstDeal = (): void => {
     let deal = [
       drawCard(curDeck),
       drawCard(curDeck),
@@ -58,7 +59,7 @@ function App() {
     setDealerEvent("playing");
   };
 
-  const doHit = () => {
+  const doHit = (): void => {
     // alert(JSON.stringify(curDeck));
     realPlayer.push(drawCard(curDeck));
     if (checkHandEvent(realPlayer) != "?!") {
@@ -68,41 +69,14 @@ function App() {
     }
   };
 
-  const doStand = () => {
+  const doStand = (): void => {
     handleWinEvent();
   };
 
-  const startDealer = () => {
-    let returnVal = "";
-    if (checkHandEvent(realPlayer) == "bust!") {
-      returnVal = (checkHandEvent(realDealer) == "natural!" ? "natural!" : "win!"); // Special case when player busts and dealer has a meaningless natural
-    } else if (checkHandEvent(realPlayer) == "six card Charlie!") {
-      returnVal = "lose!";
-    } else {
-      while (calcHand(realDealer) < 17) {
-        realDealer.push(drawCard(curDeck));
-      }
-      if (isBust(realDealer)) {
-        returnVal = "bust!";
-      } else if (checkHandEvent(realDealer) == "natural!" && checkHandEvent(realPlayer) == "natural!") {
-        returnVal = "push!";
-      } else if (checkHandEvent(realDealer) == "natural!") {
-        returnVal = "natural!";
-      } else if (calcHand(realDealer) < calcHand(realPlayer)) {
-        returnVal = "lose!";
-      } else if (calcHand(realDealer) > calcHand(realPlayer)) {
-        returnVal = "win!";
-      } else {
-        returnVal = "push!";
-      }
-    }
-    return returnVal;
-  };
-
-  const handleWinEvent = () => {
+  const handleWinEvent = (): void => {
     let playerHandEvent = checkHandEvent(realPlayer);
     let dealerHandEvent = checkHandEvent(realDealer);
-    dealerHandEvent = startDealer();
+    dealerHandEvent = startDealer(realPlayer, realDealer, curDeck);
     if (playerHandEvent == "?!") {
       if (dealerHandEvent == "bust!" || dealerHandEvent == "lose!") {
         playerHandEvent = "win!";
@@ -120,7 +94,7 @@ function App() {
     setRoundOver(true);
   };
 
-  const updateHands = () => {
+  const updateHands = (): void => {
     setPlayerHand(realPlayer);
     if (hidden) {
       setDealerHand([realDealer[0], [13, 0]]); // [13,0] is 'X', the hidden card
