@@ -9,6 +9,8 @@ let curDeck: Deck;
 let realPlayer: number[][]; // Real player's hand for calc
 let realDealer: number[][]; // Real dealer's hand for calc, includes hidden card
 let hidden = true; // Whether or not to hide dealer's first card
+let cutoff = 0.5; // Decimal fraction of when to shuffle deck
+let numDecks = 1; // Number of decks in game
 
 function App() {
   /*const [state, setState] = useState({
@@ -26,7 +28,6 @@ function App() {
   const [started, setStarted] = useState(false);
   const [roundOver, setRoundOver] = useState(false);
   const [settingModal, setSettingModal] = useState(false);
-  let cutoff = 0.5; // Decimal fraction of when to shuffle deck
 
   const startRound = (): void => {
     curDeck = createDecks(1);
@@ -35,8 +36,8 @@ function App() {
   };
 
   const restartRound = (): void => {
-    if (curDeck.numCards <= 52 * cutoff) {
-      curDeck = createDecks(1);
+    if (curDeck.numCards <= 52 * numDecks * cutoff) {
+      curDeck = createDecks(numDecks);
       alert('Deck Shuffled!');
     }
     hidden = true;
@@ -56,7 +57,6 @@ function App() {
     realPlayer = [deal[0], deal[2]];
     realDealer = [deal[1], deal[3]];
     updateHands();
-    setDealerEvent("playing");
   };
 
   const doHit = (): void => {
@@ -115,25 +115,25 @@ function App() {
         <Message name="Player" event={playerEvent} />
         <div className="buttons">
           <button
-            className={`start ${started || roundOver ? "invis" : ""}`}
+            className={`${started || roundOver ? "invis" : ""}`}
             onClick={startRound}
           >
             Start
           </button>
           <button
-            className={`hit ${started && !roundOver ? "" : "invis"}`}
+            className={`${started && !roundOver ? "" : "invis"}`}
             onClick={doHit}
           >
             Hit
           </button>
           <button
-            className={`stand ${started && !roundOver ? "" : "invis"}`}
+            className={`${started && !roundOver ? "" : "invis"}`}
             onClick={doStand}
           >
             Stand
           </button>
           <button
-            className={`restart ${roundOver ? "" : "invis"}`}
+            className={`${roundOver ? "" : "invis"}`}
             onClick={restartRound}
           >
             Next

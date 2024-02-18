@@ -1,20 +1,13 @@
 export interface Deck {
   numCards: number;
   totalCards: number[][];
+  simpleCards: number[]; // With no suits, for probability calculation
 }
 
-let baseCards: number[][] = [];
-
-let fourKinds: number[] = [];
-
-for (let j = 0; j < 4; j++) {
-  fourKinds.push(0);
-} // fourKinds = [0, 0, 0, 0], one index for each suit
-// [0] = Spades, [1] = Hearts, [2] = Diamonds, [3] = Clubs
-
-for (let i = 0; i < 13; i++) {
-  baseCards.push(fourKinds.slice());
-} // 13 indices, one for each card value, with [0] = Aces ... [12] = Kings
+// Total cards value and suits in it's indices
+// First dimension: 13 indices, one for each card value, with [0] = Aces ... [12] = Kings
+// Second dimension: 4 indicies, one for each suit,  [0] = Spades, [1] = Hearts, [2] = Diamonds, [3] = Clubs
+// E.g. deck.totalCards[6][1] is the number of 7 of Hearts in the shoe
 
 const randomInt = (num: number): number => {
   return Math.ceil(Math.random() * num);
@@ -31,6 +24,7 @@ export const drawCard = (deck: Deck): number[] => {
       if (pickedCard <= 0) {
         deck.numCards--;
         deck.totalCards[i][j]--;
+        deck.simpleCards[i]--;
         return [i, j]; // returns [value,suit] (properties of card drawn)
       }
     }
@@ -41,12 +35,14 @@ export const drawCard = (deck: Deck): number[] => {
 export const createDecks = (num: number): Deck => {
   let deck: Deck = {
     numCards: num * 52,
-    totalCards: JSON.parse(JSON.stringify(baseCards)),
+    totalCards: Array(13).fill(0).map(() => Array(4).fill(0)),
+    simpleCards: Array(13).fill(0)
   };
   for (let i = 0; i < 13; i++) {
     for (let j = 0; j < 4; j++) {
       deck.totalCards[i][j] = num;
     }
+    deck.simpleCards[i] += num * 4;
   }
   return deck;
 };
