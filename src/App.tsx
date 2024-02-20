@@ -2,7 +2,8 @@ import "./App.css";
 import Hand from "./components/Hand";
 import Message from "./components/Message";
 import Modal from "./components/Modal";
-import { Deck, drawCard, createDecks, calcHand, isBust, checkHandEvent, startDealer } from "./Functions";
+import GameButtons from "./components/GameButtons";
+import { Deck, drawCard, createDecks, checkHandEvent, startDealer } from "./Functions";
 import { useState } from "react";
 
 let curDeck: Deck;
@@ -113,42 +114,25 @@ function App() {
         <hr />
         <Hand name="Your" cards={playerHand} />
         <Message name="Player" event={playerEvent} />
-        <div className="buttons">
-          <button
-            className={`${started || roundOver ? "invis" : ""}`}
-            onClick={startRound}
-          >
-            Start
-          </button>
-          <button
-            className={`${started && !roundOver ? "" : "invis"}`}
-            onClick={doHit}
-          >
-            Hit
-          </button>
-          <button
-            className={`${started && !roundOver ? "" : "invis"}`}
-            onClick={doStand}
-          >
-            Stand
-          </button>
-          <button
-            className={`${roundOver ? "" : "invis"}`}
-            onClick={restartRound}
-          >
-            Next
-          </button>
-          <br />
-          <button 
-            className={`${settingModal ? "invis" : ""}`}
-            onClick={() => setSettingModal(true)}
-          >
-            Settings
-          </button>
-          <Modal open={settingModal} onClose={() => setSettingModal(false)}>
-            Settings coming soon!
-          </Modal>
-        </div>
+        <GameButtons
+          hasStarted={started}
+          over={roundOver}
+          playerHand={playerHand}
+          dealerHand={dealerHand}
+          startFunc={startRound}
+          hitFunc={doHit}
+          standFunc={doStand}
+          restartFunc={restartRound} />
+        <br />
+        <button 
+          className={`${settingModal ? "invis" : ""}`}
+          onClick={() => setSettingModal(true)}
+        >
+          Settings
+        </button>
+        <Modal open={settingModal} onClose={() => setSettingModal(false)}>
+          Settings coming soon!
+        </Modal>
       </div>
     </div>
   );
