@@ -120,23 +120,3 @@ export const startDealer = (playerHand: number[][], dealerHand: number[][], deck
   }
   return returnVal;
 };
-
-export const calcHit = (playerHand: number[][], dealerHand: number[][]): boolean => {
-  return calcHand(playerHand) != 21;
-}
-
-export const calcStand = (playerHand: number[][], dealerHand: number[][]): boolean => {
-  return true;
-}
-
-export const calcDoubleDown = (playerHand: number[][], dealerHand: number[][]): boolean => {
-  return (playerHand.length == 2) && (calcHand(playerHand) != 21);
-}
-
-export const calcSplit = (playerHand: number[][], dealerHand: number[][]): boolean => {
-  return (playerHand.length == 2) && (playerHand[0][0] == playerHand[1][0]);
-}
-
-export const calcInsurance = (playerHand: number[][], dealerHand: number[][]): boolean => {
-  return dealerHand[0][0] == 0;
-}

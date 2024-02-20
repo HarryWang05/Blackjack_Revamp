@@ -125,7 +125,7 @@ function App() {
           restartFunc={restartRound} />
         <br />
         <button 
-          className={`${settingModal ? "invis" : ""}`}
+          className={`${settingModal ? "invis" : ""} settings`}
           onClick={() => setSettingModal(true)}
         >
           Settings
